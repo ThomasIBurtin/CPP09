@@ -5,6 +5,9 @@
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <limits.h>
+#include <cstdlib>
+#include <iomanip>
 
 class ImpossibleFile : std::exception
 {
@@ -16,7 +19,7 @@ class ImpossibleFile : std::exception
 };
 
 void parse_data(std::map<std::string, float> &data_dictionaire);
-void input(std::map<std::string, float> &data_dictionaire, std::string input_file);
+void input(std::map<std::string, float> &data_dictionaire, char *input_file);
 std::string trim(const std::string& str);
 void check_key(const std::string& key);
 void check_value(float value);

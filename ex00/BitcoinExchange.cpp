@@ -57,15 +57,15 @@ void check_value(float value)
 {
     if(value < 0)
         throw std::string("Error: not a positive number.");
-    if(value >= INT_MAX)
+    if(value >= static_cast<float>(INT_MAX))
         throw std::string("Error: too large a number.");
 }
 
 std::map<std::string, float>::iterator find_key(std::map<std::string, float> &data_dictionaire, std::string& key)
 {
-    int year = std::atoi(key.substr(0, 4).c_str());
-    int month = std::atoi(key.substr(5, 2).c_str());
-    int day = std::atoi(key.substr(8, 2).c_str());
+    int year = atoi(key.substr(0, 4).c_str());
+    int month = atoi(key.substr(5, 2).c_str());
+    int day = atoi(key.substr(8, 2).c_str());
 
     std::map<std::string, float>::iterator it = data_dictionaire.find(key);
     if (it != data_dictionaire.end())
@@ -99,7 +99,7 @@ std::map<std::string, float>::iterator find_key(std::map<std::string, float> &da
 }
 
 
-void input(std::map<std::string, float> &data_dictionaire, std::string input_file)
+void input(std::map<std::string, float> &data_dictionaire, char *input_file)
 {
     std::ifstream input(input_file);
     if(!input.is_open())
@@ -116,7 +116,7 @@ void input(std::map<std::string, float> &data_dictionaire, std::string input_fil
 
             std::string key = trim(line.substr(0, pipe_pos));
             std::string v = line.substr(pipe_pos + 1);
-            float value = std::atof(v.c_str());
+            float value = atof(v.c_str());
             check_key(key);
             check_value(value);
 
