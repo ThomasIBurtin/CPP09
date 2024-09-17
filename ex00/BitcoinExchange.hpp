@@ -9,15 +9,6 @@
 #include <cstdlib>
 #include <iomanip>
 
-class ImpossibleFile : std::exception
-{
-    public:
-	const char* what() const throw()
-	{
-		return("ImpossibleFile");
-	}
-};
-
 void parse_data(std::map<std::string, float> &data_dictionaire);
 void input(std::map<std::string, float> &data_dictionaire, char *input_file);
 std::string trim(const std::string& str);

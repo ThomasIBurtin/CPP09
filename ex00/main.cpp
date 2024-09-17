@@ -15,8 +15,8 @@ int main(int argc, char **argv)
         parse_data(data_dictionaire);
         input(data_dictionaire, argv[1]);
     }
-    catch(const ImpossibleFile& e)
+    catch (const std::exception & e)
     {
-        std::cerr << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
     }
 }

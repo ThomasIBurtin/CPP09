@@ -4,7 +4,7 @@ void parse_data(std::map<std::string, float> &data_dictionaire)
 {
     std::ifstream data("data.csv");
     if(!data.is_open())
-        throw ImpossibleFile();
+        throw std::runtime_error("ImpossibleFile");
         
     std::string line;
     while (std::getline(data, line))
@@ -37,12 +37,12 @@ std::string trim(const std::string &str)
 void check_key(std::string &key)
 {   
     if (key.length() != 10 || key[4] != '-' || key[7] != '-')
-        throw std::string("respect format");
+        throw std::runtime_error("respect format");
 
     for (std::size_t i = 0; i < 10; ++i)
     {
         if (i != 4 && i != 7 && !std::isdigit(key[i]))
-            throw std::string("respect format");
+            throw std::runtime_error("respect format");
     }
 
     int year = std::atoi(key.substr(0, 4).c_str());
@@ -50,15 +50,15 @@ void check_key(std::string &key)
     int day = std::atoi(key.substr(8, 2).c_str());
 
     if (year > 2024 || month > 12 || day > 31)
-        throw std::string("respect format");
+        throw std::runtime_error("respect format");
 }
 
 void check_value(float value)
 {
     if(value < 0)
-        throw std::string("Error: not a positive number.");
+        throw std::runtime_error("Error: not a positive number.");
     if(value >= static_cast<float>(INT_MAX))
-        throw std::string("Error: too large a number.");
+        throw std::runtime_error("Error: too large a number.");
 }
 
 std::map<std::string, float>::iterator find_key(std::map<std::string, float> &data_dictionaire, std::string& key)
@@ -103,7 +103,7 @@ void input(std::map<std::string, float> &data_dictionaire, char *input_file)
 {
     std::ifstream input(input_file);
     if(!input.is_open())
-        throw ImpossibleFile();
+        throw std::runtime_error("ImpossibleFile");
 
     std::string line;
     while (std::getline(input, line))
@@ -112,7 +112,8 @@ void input(std::map<std::string, float> &data_dictionaire, char *input_file)
         {
             size_t pipe_pos = line.find('|');
             if (pipe_pos == std::string::npos)
-                throw std::string("Error: bad input => " + line);
+                throw std::runtime_error("Error: bad input => " + line);
+
 
             std::string key = trim(line.substr(0, pipe_pos));
             std::string v = line.substr(pipe_pos + 1);
@@ -123,10 +124,10 @@ void input(std::map<std::string, float> &data_dictionaire, char *input_file)
             std::map<std::string, float>::iterator it = find_key(data_dictionaire, key);
             std::cout << key << " => " << value << " = " << value * it->second << std::endl;
         }
-        catch(const std::string& e)
+        catch (const std::exception & e)
         {
-            std::cerr << e << std::endl;
-        }
+		    std::cout << e.what() << std::endl;
+	    }
     }
     input.close();
 }
