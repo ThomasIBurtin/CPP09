@@ -1,60 +1,145 @@
 #include "PmergeMe.hpp"
 
-void vecSort(std::vector<int> & input)
-{	
-	clock_t start = clock();
-	
-	size_t const				half_size = input.size() / 2;
-	std::vector<int>			split_lo(input.begin(), input.begin() + half_size);
-	std::vector<int>			split_hi(input.begin() + half_size, input.end());
-
-	std::vector<int>::iterator	it;
-	std::vector<int>::iterator	ite;
-
-	std::sort(split_lo.begin(), split_lo.end());
-	std::sort(split_hi.begin(), split_hi.end());
-
-	split_lo.insert(split_lo.end(), split_hi.begin(), split_hi.end());
-
-	std::sort(split_lo.begin(), split_lo.end());
-	
-	std::cout << "After: ";
-	for (it = split_lo.begin(), ite = split_lo.end(); it != ite; it++)
-		std::cout << " " << *it;
-	std::cout << std::endl;
-
-	clock_t end = clock();
-    double duration = (double)(end - start) / CLOCKS_PER_SEC * 1000000;
-    std::cout << "Time to process a range of " << input.size() << " elements with std::vector<int> : " << duration << " us" << std::endl;
+bool	isDuplicate(int num, int arr[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		if (arr[i] == num)
+			return false;
+	}
+	return true;
 }
 
-void listSort(std::deque<int>	&deque)
+bool	isNumber(char *arg)
 {
-	clock_t start = clock();
-	
-	std::deque<int>::iterator	it = deque.begin();
-	std::deque<int>::iterator	ite = deque.end();
-
-	size_t const				half_size = deque.size() / 2;
-	std::deque<int>				split_lo;
-	std::deque<int>				split_hi;
-
-	for (size_t i = 0; i < half_size; i++)
+	for (size_t j = 0; j < std::strlen(arg); ++j)
 	{
-		split_lo.push_back(*it);
-		it++;
+		if (!std::isdigit(arg[j]))
+			return false;
 	}
-	for (; it != ite; it++)
-		split_hi.push_back(*it);
+	return true;
+}
 
-	std::sort(split_lo.begin(), split_lo.end());
-	std::sort(split_hi.begin(), split_hi.end());
+bool	isValid(int argc, char *argv[])
+{
+	if (argc < 2)
+		return std::cerr << "Usage: " << argv[0] << " [num...]" << std::endl, false;
+	int numbers[argc - 1];
+	int count = 0;
 
-	split_lo.insert(split_lo.end(), split_hi.begin(), split_hi.end());
+	for (int i = 1; i < argc; ++i)
+	{
+		char *arg = argv[i];
 
-	std::sort(split_lo.begin(), split_lo.end());
+		if (!isNumber(arg))
+			return std::cerr << "Error: Characters include." << std::endl, false;
 
-	clock_t end = clock();
-    double duration = (double)(end - start) / CLOCKS_PER_SEC * 1000000;
-    std::cout << "Time to process a range of " << deque.size() << " elements with std::deque<int> : " << duration << " us" << std::endl;
+		long num = std::atol(arg);
+		if (num > INT_MAX || num < 0)
+			return std::cerr << "only positive integer sequence as argument." << std::endl, false;
+
+		if (!isDuplicate(num, numbers, count))
+			return std::cerr << "Error: There are duplicate numbers." << std::endl, false;
+
+		numbers[count] = static_cast<int>(num);
+		++count;
+	}
+	return true;
+}
+
+void	mergeInsertionSort(std::vector<int>& arr)
+{
+	if (arr.size() <= 1)
+		return;
+	std::vector<int> larger, smaller;
+
+	for (size_t i = 0; i < arr.size(); i += 2)
+	{
+		if (i + 1 < arr.size())
+		{
+			larger.push_back(std::max(arr[i], arr[i + 1]));
+			smaller.push_back(std::min(arr[i], arr[i + 1]));
+		}
+		else
+			larger.push_back(arr[i]);
+	}
+	mergeInsertionSort(larger);
+	int smallestLarger = larger[0];
+	int correspondingSmaller = -1;
+	for (size_t i = 0; i < arr.size(); i += 2)
+	{
+		if (i + 1 < arr.size())
+		{
+			if (arr[i] == smallestLarger || arr[i + 1] == smallestLarger)
+			{
+				correspondingSmaller = std::min(arr[i], arr[i + 1]);
+				break;
+			}
+		}
+	}
+	arr.clear();
+	arr = larger;
+	if (correspondingSmaller != -1)
+		arr.insert(arr.begin(), correspondingSmaller);
+	for (size_t i = 0; i < smaller.size(); ++i)
+	{
+		if (smaller[i] != correspondingSmaller)
+		{
+			std::vector<int>::iterator it = std::lower_bound(arr.begin(), arr.end(), smaller[i]);
+			arr.insert(it, smaller[i]);
+		}
+	}
+}
+
+void	mergeInsertionSort(std::list<int>& arr)
+{
+	if (arr.size() <= 1)
+		return;
+
+	std::list<int> larger, smaller;
+	std::list<int>::iterator it = arr.begin();
+	for (size_t i = 0; i < arr.size(); i += 2)
+	{
+		if (i + 1 < arr.size())
+		{
+			int first = *it++;
+			int second = *it++;
+			larger.push_back(std::max(first, second));
+			smaller.push_back(std::min(first, second));
+		}
+		else
+			larger.push_back(*it++);
+	}
+	mergeInsertionSort(larger);
+	int smallestLarger = larger.front();
+	int correspondingSmaller = -1;
+	it = arr.begin();
+	for (size_t i = 0; i < arr.size(); i += 2)
+	{
+		if (i + 1 < arr.size())
+		{
+			int first = *it++;
+			int second = *it++;
+			if (first == smallestLarger || second == smallestLarger)
+			{
+				correspondingSmaller = std::min(first, second);
+				break;
+			}
+		}
+	}
+
+	arr.clear();
+	arr = larger;
+
+	if (correspondingSmaller != -1)
+		arr.push_front(correspondingSmaller);
+
+	for (std::list<int>::iterator it = smaller.begin(); it != smaller.end(); ++it)
+	{
+		if (*it != correspondingSmaller)
+		{
+			std::list<int>::iterator pos = std::lower_bound(arr.begin(), arr.end(), *it);
+			arr.insert(pos, *it);
+		}
+	}
 }

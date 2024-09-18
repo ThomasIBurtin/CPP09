@@ -1,29 +1,37 @@
 #include "PmergeMe.hpp"
 
-int	main(int ac, char **av)
+int main(int argc, char* argv[])
 {
-	std::vector<int>	input;
-
-	if (ac < 3)
-		return std::cout << "Error: Usage: ./sort [int sequence]" << std::endl, 1;
-	
-	for (int i = 1; av[i]; i++)
-	{
-		for (int j = 0; av[i][j]; j++)
-			if (!isdigit(av[i][j]))
-				return std::cout << "Error." << std::endl, 1;
-		int nb = atoi(av[i]);
-		if (nb < 0)
-			return std::cout << "Error." << std::endl, 1;
-		input.push_back(nb);
-	}
-
-	std::cout << "Before: ";
-	for (std::vector<int>::iterator	it = input.begin(); it != input.end(); it++)
-		std::cout << " " << *it;
+	if (!isValid(argc, argv))
+		return 1;
+	std::vector<int> vec;
+	for (int i = 1; i < argc; ++i)
+		vec.push_back(std::atoi(argv[i]));
+	std::cout << "Before:\t";
+	for (size_t i = 0; i < vec.size(); ++i)
+		std::cout << vec[i] << " ";
 	std::cout << std::endl;
-	
-	std::deque<int>		deque(input.begin(), input.end());
-	vecSort(input);
-	listSort(deque);
+	std::clock_t start = std::clock();
+	mergeInsertionSort(vec);
+	std::clock_t end = std::clock();
+	double elapsed_time = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+	std::cout << "After:\t";
+	for (size_t i = 0; i < vec.size(); ++i)
+		std::cout << vec[i] << " ";
+	std::cout << std::endl;
+	std::cout << "Time to process a range of " << vec.size() << " elements with std::vector : "  <<
+	std::fixed << std::setprecision(6) << elapsed_time << " sec"
+	<< std::endl;
+
+
+	std::list<int> lst;
+	for (int i = 1; i < argc; ++i)
+		lst.push_back(std::atoi(argv[i]));
+	start = std::clock();
+	mergeInsertionSort(lst);
+	end = std::clock();
+	elapsed_time = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+	std::cout << "Time to process a range of " << lst.size() << " elements with std::list : "  <<
+	std::fixed << std::setprecision(6) << elapsed_time << " sec"
+	<< std::endl;
 }
