@@ -64,30 +64,12 @@ void	mergeInsertionSort(std::vector<int>& arr)
 			larger.push_back(arr[i]);
 	}
 	mergeInsertionSort(larger);
-	int smallestLarger = larger[0];
-	int correspondingSmaller = -1;
-	for (size_t i = 0; i < arr.size(); i += 2)
-	{
-		if (i + 1 < arr.size())
-		{
-			if (arr[i] == smallestLarger || arr[i + 1] == smallestLarger)
-			{
-				correspondingSmaller = std::min(arr[i], arr[i + 1]);
-				break;
-			}
-		}
-	}
 	arr.clear();
 	arr = larger;
-	if (correspondingSmaller != -1)
-		arr.insert(arr.begin(), correspondingSmaller);
 	for (size_t i = 0; i < smaller.size(); ++i)
 	{
-		if (smaller[i] != correspondingSmaller)
-		{
 			std::vector<int>::iterator it = std::lower_bound(arr.begin(), arr.end(), smaller[i]);
 			arr.insert(it, smaller[i]);
-		}
 	}
 }
 
@@ -111,35 +93,13 @@ void	mergeInsertionSort(std::list<int>& arr)
 			larger.push_back(*it++);
 	}
 	mergeInsertionSort(larger);
-	int smallestLarger = larger.front();
-	int correspondingSmaller = -1;
-	it = arr.begin();
-	for (size_t i = 0; i < arr.size(); i += 2)
-	{
-		if (i + 1 < arr.size())
-		{
-			int first = *it++;
-			int second = *it++;
-			if (first == smallestLarger || second == smallestLarger)
-			{
-				correspondingSmaller = std::min(first, second);
-				break;
-			}
-		}
-	}
 
 	arr.clear();
 	arr = larger;
 
-	if (correspondingSmaller != -1)
-		arr.push_front(correspondingSmaller);
-
 	for (std::list<int>::iterator it = smaller.begin(); it != smaller.end(); ++it)
 	{
-		if (*it != correspondingSmaller)
-		{
-			std::list<int>::iterator pos = std::lower_bound(arr.begin(), arr.end(), *it);
-			arr.insert(pos, *it);
-		}
+		std::list<int>::iterator pos = std::lower_bound(arr.begin(), arr.end(), *it);
+		arr.insert(pos, *it);
 	}
 }
